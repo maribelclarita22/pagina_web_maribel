@@ -1,894 +1,495 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consulta de Expedientes — UNA Puno</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Búsqueda de Expedientes - Poder Judicial</title>
+
 <style>
-  .oculto{display:none; }
-  :root{
-    --brand:lab(23.28% 42.56 30.77); --brand-700:#4e0a0a; --brand-300:#700e1b;
-    --accent:#172e7c; --muted:#6b7280; --success:#2e7d32; --warning:#b25d00;
-  }
-  html, body { height:100%; }
-  body{ font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#f5f6fb; display:flex; flex-direction:column; }
-
-  /* Barra superior con logo EP_Derecho.png */
-  .topbar{ background:linear-gradient(90deg,var(--brand) 0%, var(--brand-700) 100%); }
-  .topbar .container{ display:flex; align-items:center; gap:1rem; padding-top:.4rem; padding-bottom:.4rem; }
-  .brand{ display:flex; align-items:center; gap:.6rem; text-decoration:none; color:#fff; font-weight:600; }
-  .brand img{ height:38px; width:auto; display:block; }
-  .nav-compact .nav-link{ color:#fff; }
-  .nav-compact .nav-link:hover{ color:#c7f7f1; }
-
-  main{ flex:1; }
-  .hero{ border:1px solid #e6edf4; background:linear-gradient(180deg,#eef4ff 0%,#ffffff 100%); border-radius:14px; box-shadow:0 10px 28px rgba(0,24,61,.12); }
-  .shadow-soft{ box-shadow:0 10px 24px rgba(16,24,40,.06); }
-  .table thead th{ background:#e6effa; color:#0b2141; font-weight:1900; }
-  .form-control:focus{ border-color:var(--brand-300); box-shadow:0 0 0 .2rem rgba(0,49,102,.18); }
-  .badge-rol{ background:var(--success); }
-
-  /* Footer */
-  .site-footer{ background:linear-gradient(180deg,var(--brand) 0%, var(--brand-700) 100%); color:#e9f5ff; border-top:11px solid rgba(255,255,255,.1); }
-  .site-footer .divider{ height:1px; background:rgba(255,255,255,.18); }
-  .social a{ width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;
-             background:rgba(255,255,255,.12); color:#e9f5ff; text-decoration:none; }
-  .social a:hover{ background:rgba(255,255,255,.22); }
-
-  /* Panel lateral “Acerca de mí” con :target */
-  .about-panel{ position:fixed; top:0; left:0; height:100vh; width:340px; max-width:92vw; background:#fff; color:#0b2141;
-    border-right:1px solid #e6edf4; box-shadow:6px 0 24px rgba(0,0,0,.15); transform:translateX(-100%); transition:transform .25s ease; z-index:1055; display:flex; flex-direction:column; }
-  #about:target .about-panel{ transform:translateX(0); }
-
-  /* Encabezado del panel con logo EP_Derecho.png */
-  .about-header{ background: linear-gradient(90deg, var(--brand) 0%, var(--brand-700) 100%); color:#fff; padding:14px 16px;
-    display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.08); }
-  .about-title{ display:flex; align-items:center; gap:.75rem; }
-  .about-title img{ height:32px; width:auto; border-radius:6px; background:#ffffff22; padding:4px; box-shadow:0 1px 0 rgba(255,255,255,.1) inset; }
-  .about-sub{ opacity:.85; font-size:.9rem; margin-top:2px; }
-  .about-body{ padding:16px; overflow:auto; }
-  .about-avatar{ width:64px; height:64px; border-radius:12px; background:#00316622; color:#003166; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:28px; }
-  .about-field{ margin:.5rem 0 } .about-field .label{ font-weight:600; font-size:.9rem; color:#365 } .about-field .value{ color:#123 }
-  .btn-close{ background:#ffffff2b; border:1px solid #ffffff3a; color:#eaf4ff; padding:.35rem .6rem; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; }
-  .btn-close:hover{ background:#ffffff3f; }
-  .backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.25); opacity:0; pointer-events:none; transition:opacity .2s; z-index:1050; }
-  #about:target .backdrop{ opacity:1; pointer-events:auto; }
-
-  /* Tarjetas de expedientes */
-  .exp-card{ border:1px solid #e6edf4; border-radius:12px; padding:12px 14px; background:#fff; display:flex; gap:12px; align-items:center; }
-  .exp-pill{ font-size:.75rem; padding:.2rem .5rem; border-radius:999px; background:#eef4ff; color:#0b2a55; border:1px solid #d6e3f7; }
-  .status{ font-weight:600; }
-  .status.en-tramite{ color:#1a7f37; }
-  .status.archivado{ color:#7a1b1b; }
-  .btn-view{ padding:.35rem .6rem; border-radius:8px; border:1px solid #d6e3f7; background:#eef4ff; color:#9098a5; text-decoration:none; }
-  .btn-view:hover{ background:#e2ecff; }
-
-  @media (max-width:576px){
-    .brand span{ display:none } .brand img{ height:34px }
-    .nav-compact .nav-link{ padding:.4rem .6rem }
-  }
-
-      .card.bg-light {
-  background-color: #f9fcff !important; /* color del interior del cuadro */
+:root {
+  --rojo: #7d0000;
+  --rojo-oscuro: #5a0000;
+  --gris: #f7f7f7;
+  --borde: #d1d1d1;
+  --azul: #003366;
 }
 
-.card-header.bg-primary {
-  background-color: #083472 !important; /* azul oscuro */
+/* === GENERAL === */
+body {
+  font-family: "Segoe UI", sans-serif;
+  background-color: white;
+  color: #222;
+  margin: 0;
+  padding: 0;
 }
 
-.card-header.bg-success {
-  background-color: #05247c !important; /* verde más intenso */
+/* === ENCABEZADO === */
+.navbar {
+  background-color: var(--rojo);
+  color: white;
+  padding: 10px 0;
+}
+.navbar .container {
+  width: 90%;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 18px;
+}
+.navbar-brand img {
+  height: 32px;
+}
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+.nav-links a:hover {
+  text-decoration: underline;
+  color: #ffc107;
 }
 
-.card-header.bg-dark {
-  background-color: #2f2f2f !important; /* gris oscuro */
+/* === COMUNICADO === */
+.comunicado {
+  background-color: #fff5f5;
+  border: 1px solid var(--rojo);
+  color: var(--rojo);
+  text-align: center;
+  padding: 10px 20px;
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 20px auto;
+  width: 90%;
+  max-width: 1100px;
+}
+.comunicado strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 4px;
 }
 
-  body {
-      background-color: #f9f9f9;
-      font-family: "Segoe UI", sans-serif;
-    }
-    .exp-card {
-      display: flex;
-      align-items: center;
-      background: white;
-      border-radius: 12px;
-      padding: 15px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
-    .exp-pill {
-      background: #a9b1b9;
-      color: white;
-      padding: 8px 12px;
-      border-radius: 50px;
-      font-weight: 600;
-      margin-right: 15px;
-    }
-    .btn-view {
-      background: #054970;
-      border: none;
-      color: white;
-      padding: 6px 12px;
-      border-radius: 6px;
-    }
-    .btn-view:hover {
-      background: #05037e;
-    }
-    /* Estilos del visor */
-    #visorDrive {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.85);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-    #visorDrive iframe {
-      width: 90%;
-      height: 90%;
-      border: none;
-      border-radius: 10px;
-      background: white;
-    }
-    #cerrarVisor {
-      position: absolute;
-      top: 20px;
-      right: 40px;
-      font-size: 30px;
-      color: white;
-      cursor: pointer;
-      background: none;
-      border: none;
-    }
-    #cerrarVisor:hover {
-      color: #ff6b6b;
-    }
-      /* Ajuste del visor para varios documentos */
-  #visorDrive {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.85);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-  }
-  #visorDrive iframe {
-    width: 90%; height: 90%;
-    border: none;
-    border-radius: 10px;
-    background: white;
-  }
-  #cerrarVisor {
-    position: absolute;
-    top: 20px; right: 40px;
-    font-size: 30px;
-    color: white;
-    cursor: pointer;
-    background: none;
-    border: none;
-  }
-  #cerrarVisor:hover {
-    color: #ff6b6b;
-  }
+/* === FORMULARIO PRINCIPAL === */
+.container-main {
+  width: 90%;
+  max-width: 850px;
+  margin: 30px auto;
+  background: #fff;
+  border: 1px solid #cfcfcf;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.header-tabs {
+  display: flex;
+  background-color: var(--rojo);
+}
+.header-tabs button {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  background-color: #e6e6e6;
+  color: var(--rojo);
+  font-weight: bold;
+  cursor: pointer;
+}
+.header-tabs button.active {
+  background-color: var(--rojo);
+  color: #fff;
+}
+
+/* === FORMULARIOS === */
+.formulario {
+  padding: 20px 30px;
+  background-color: var(--gris);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+label {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+select, input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--borde);
+  border-radius: 4px;
+  font-size: 14px;
+}
+small {
+  color: #003399;
+  font-size: 12px;
+}
+
+/* === CAPTCHA === */
+.captcha-container {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px auto;
+  width: 80%;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.captcha-header {
+  background-color: var(--rojo);
+  color: #fff;
+  padding: 8px;
+  text-align: center;
+  border-radius: 6px 6px 0 0;
+  font-weight: bold;
+  margin: -20px -20px 15px -20px;
+}
+.captcha {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+#captcha-text {
+  background: #000;
+  color: #fff;
+  font-weight: bold;
+  font-size: 22px;
+  padding: 5px 15px;
+  border-radius: 6px;
+  letter-spacing: 2px;
+}
+#captcha-msg {
+  text-align: center;
+  margin-top: 10px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* === BOTÓN === */
+.btn-consultar {
+  background-color: var(--rojo);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 30px;
+  font-size: 15px;
+  cursor: pointer;
+  display: block;
+  margin: 15px auto;
+}
+.btn-consultar:hover {
+  background-color: var(--rojo-oscuro);
+}
+
+footer {
+  text-align: center;
+  font-size: 12px;
+  color: #555;
+  margin: 20px 0;
+}
 </style>
 </head>
-<body id="top">
+<body>
 
-  <!-- Barra superior con el nuevo logo EP_Derecho.png -->
-  <nav class="navbar topbar">
-    <div class="container">
-      <a class="brand" href="#top">
-        <img src="PODER_JUDICIALL.png" alt="Logo Escuela Profesional de Derecho">
-        <span>PODER JUDICIAL</span>
-      </a>
-      <div class="ms-auto nav-compact" style="display :flex; gap :36px;">
-        <a class="nav-link d-inline-block" href="#top  ">Inicio</a>
-        <a class="nav-link d-inline-block" href="#  consultar    r">Consultar</a>
-        <a class="nav-link d-inline-block" href="#expedientes">Expedientes</a>
-        <a class="nav-link d-inline-block" href="#about">Acerca de mí</a>
-      </div>
-    </div>
-  </nav>
-
-  <main class="container my-4">
-    <section id="inicio" class="mb-4">
-      <div class="p-4 p-md-5 hero">
-        <h2 class="text-center">Plataforma Nacional De Consulta De Expedientes Judiciales</h2>
-        <p class="mb-0 text-center">Ingresa el número de tu expediente y consulta al instante</p>
-      </div>
-    </section>
-
-    <section id="consultar" class="mb-4">
-      <div class="card shadow-soft p-4">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-          <h5 class="mb-0">Consultar expediente</h5>
-          <span class="text-muted small">Presiona Enter para buscar</span>
-        </div>
-        <form class="row g-2" onsubmit="return false;"> 
-          <div class="col-lg-10">
-            <input id="input-busqueda" 
-              class="form-control form-control-lg" 
-              placeholder="Ej: EXP-2025-000123 o 43111222" 
-              aria-label="Buscar por código o DNI">
-          </div>
-          <div class="col-lg-2 d-grid">
-            <button id="btn-consultar" type="button" 
-              class="btn btn-lg btn-consultar-expediente" 
-              style="background:#093466;border:none;color:#fcfdff">
-              Consultar
-            </button>
-          </div>
-          <div id="mensaje-error" 
-                class="text-center mt-3 text-danger fw-semibold" 
-                style="display:none;">
-              ⚠️ No se encontró ningún expediente, vuelva a ingresar los datos.
-          </div>
-
-        </form>
-      </div>
-    </section>
-
-    <!-- EXPEDIENTES ACTUALIZADO -->
-    <section id="expedientes" class="oculto">
-      
-      <div class="container py-4">
-    <h4 class="text-center mb-4 fw-bold">Detalle del Expediente</h4>
-
-    <!-- 🟦 Datos del Expediente -->
-    <div class="card border-0 shadow-sm mb-4">
-      <div class="card-header bg-primary text-white fw-semibold text-center">
-        Información del Expediente
-      </div>
-      <div class="card-body bg-light">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <div class="info-box p-3 bg-white border rounded shadow-sm h-100">
-              <div class="fw-bold text-muted small mb-1">Estado</div>
-              <div class="fs-6 fw-semibold text-dark">Resuelto</div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="info-box p-3 bg-white border rounded shadow-sm h-100">
-              <div class="fw-bold text-muted small mb-1">Materia</div>
-              <div class="fs-6 fw-semibold text-dark">Alimentos</div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="info-box p-3 bg-white border rounded shadow-sm h-100">
-              <div class="fw-bold text-muted small mb-1">Proceso</div>
-              <div class="fs-6 fw-semibold text-dark">Unico</div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="info-box p-3 bg-white border rounded shadow-sm h-100">
-              <div class="fw-bold text-muted small mb-1">Fecha de Ingreso</div>
-              <div class="fs-6 fw-semibold text-dark">20/01/2025</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 🟩 Sujetos Procesales -->
-    <div class="card border-0 shadow-sm mb-4">
-      <div class="card-header bg-success text-white fw-semibold text-center">
-        Sujetos Procesales
-      </div>
-      <div class="card-body bg-light">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <div class="info-box p-3 bg-white border rounded shadow-sm h-100">
-              <div class="fw-bold text-muted small mb-1">Demandante</div>
-              <div class="fs-6 fw-semibold text-dark">REYNA VALDEZ MAMANI</div>
-              <div class="small text-muted">DNI: 43111222</div>
-              <div class="small text-muted">Dirección: Jr. Lima 320 - Puno</div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="info-box p-3 bg-white border rounded shadow-sm h-100">
-              <div class="fw-bold text-muted small mb-1">Demandado</div>
-              <div class="fs-6 fw-semibold text-dark">ELMER MAMANI CUELA</div>
-              <div class="small text-muted">DNI: 44123211</div>
-              <div class="small text-muted">Dirección: Av. Floral 1020 - Puno</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-      <!-- Tarjetas resumen -->
-<div class="row g-3 mb-3">
-  <div class="col-md-6">
-    <div class="exp-card">
-      <div class="exp-pill">EXP-2025-000123</div>
-      <div class="flex-grow-1">
-        <div class="fw-semibold">Demanda de alimentos <span class="status RESUELTO ">• Resuelto</span></div>
-        <div class="text-muted small">Juzgado Civil 1 — Carátula: Mamani c/ Pérez</div>
-      </div>
-      <!-- 👁️ Botón con ícono de “ver” -->
-      <button class="btn-view btn-show-detail" data-exp="2025-000123">
-        👁️ Ver
-      </button>
+<!-- === ENCABEZADO === -->
+<nav class="navbar">
+  <div class="container">
+    <a class="navbar-brand" href="#">
+      <img src="PODER_JUDICIALL.png" alt="Logo">
+      PODER JUDICIAL
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Inicio</a>
+      <a href="index.html">Consultar</a>
+      <a href="#">Acerca de mi</a>
     </div>
   </div>
-  <div class="col-md-6">
-    <div class="exp-card">
-      <div class="exp-pill">EXP-2025-000123</div>
-      <div class="flex-grow-1">
-        <div class="fw-semibold">Demanda de alimentos <span class="status archivado">• Resuelto</span></div>
-        <div class="text-muted small">Juzgado Civil 1 — Carátula: Mamani c/ Pérez</div>
-      </div>
-      <!-- 👁️ Botón con ícono de “ver” -->
-      <button class="btn-view btn-show-detail" data-exp="2025-000123">
-        👁️ Ver
-      </button>
-    </div>
-  </div>
+</nav>
+
+<!-- === COMUNICADO === -->
+<div class="comunicado">
+  <strong>COMUNICADO</strong>
+  A partir de la fecha, se ha incluido un nuevo campo como medida técnica de protección, 
+  para que solo las partes puedan acceder a sus expedientes; a requerimiento de la Autoridad 
+  Nacional de Protección de Datos Personales y el MINJUSDH.
 </div>
 
-<!-- 🧾 Tabla detallada (ahora con soporte para 10 documentos) -->
-<div class="oculto " id="detalle-expediente">
-  <h2 class="mb-4 text">Historial De Expediente</h2>
+<!-- === FORMULARIO PRINCIPAL === -->
+<div class="container-main">
+  <div class="header-tabs">
+    <button class="active" id="tab-filtros">Por filtros</button>
+    <button id="tab-codigo">Por Código de Expediente</button>
+  </div>
 
-  <div class="table-responsive">
-    <table class="table table-hover align-middle mb-0">
-      <thead class="table-light">
-        <tr>
-          <th>#</th>
-          <th>Acto</th>
-          <th>Sumilla</th>
-          <th>Fecha de ingreso</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td>Escrito</td>
-          <td>Demanda De Alimentos </td>
-          <td>20/01/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/1AjnnU3TmxgLQ-qCGIu8HdSEJ6aXCe9r1/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/1iawcB_Pfhs2eQiGui4xPk5YxxlXWSyaxSaqLkPuoVr8/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
+  <!-- === FORMULARIO POR FILTROS === -->
+  <div id="form-filtros" class="formulario">
+    <div class="form-group">
+      <label>Distrito judicial *</label>
+      <select>
+      <option value="">--SELECCIONAR--</option>
+        <option>Amazonas</option>
+        <option>Áncash</option>
+        <option>Apurímac</option>
+        <option>Arequipa</option>
+        <option>Ayacucho</option>
+        <option>Cajamarca</option>
+        <option>Callao</option>
+        <option>Camañ</option>
+        <option>Huancavelica</option>
+        <option>Huánuco</option>
+        <option>Ica</option>
+        <option>Junín</option>
+        <option>La Libertad</option>
+        <option>Lambayeque</option>
+        <option>Lima</option>
+        <option>Pasco</option>
+        <option>Puno</option>
+        <option>San Martín</option>
+        <option>Piura</option>
+        <option>Tacna</option>
+        <option>Tumbes</option>
+        <option>Ucayali</option>
+      </select>
+    </div>
 
-        <tr>
-          <td>2</td>
-          <td>Escrito</td>
-          <td>Anexo de la Demanda</td>
-          <td>20/01/2025</td>
+    <div class="form-group">
+      <label>Instancia *</label>
+      <input type="text" placeholder="Ingrese la instancia">
+    </div>
 
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/1mOnkGsetjXkC_qDUvYg79Y-kLZMkyFo_/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/1b2c3d4e5f6g7h8i9j0kLmNoPqRsTuVwXyZz/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
-        
-        <tr>
-          <td>3</td>
-          <td>Resolucion</td>
-          <td>Admision De La Demanda y Programacion de la audiencia unica</td>
-          <td>24/01/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/187yUcSsADliIrWsEJug3qwP4ss22jXHM/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/3rdocExample/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
+    <div class="form-group">
+      <label>Especialidad *</label>
+      <input type="text" placeholder="Ingrese la especialidad">
+    </div>
 
-        <tr>
-          <td>4</td>
-          <td>Oficio</td>
-          <td>OFICIO Nro. 01-2025-PS-PJPL-CSJP-PJ.</td>
-          <td>24/01/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/1JUCam3frDK5fCHZ7TP95UeXUIohZHUeF/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/4thdocExample/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
+    <div class="form-group">
+      <label>Año *</label>
+      <select>
+        <option value="">--SELECCIONAR--</option>
+        <option>2025</option>
+        <option>2024</option>
+        <option>2023</option>
+        <option>2022</option>
+        <option>2021</option>
+        <option>2020</option>
+        <option>2019</option>
+        <option>2018</option>
+        <option>2017</option> 
+        <option>2016</option>
+        <option>2015</option> 
 
-        <tr>
-          <td>5</td>
-          <td>Oficio</td>
-          <td>OFICIO Nro. 02- 2025-PS-PJPL-CSJP-PJ.</td>
-          <td>24/01/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/1qKuPy6hfJfsu57ndy7Oq-0IQ36I30E6T/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/5thdocExample/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
+      </select>
+    </div>
 
-        <tr>
-          <td>6</td>
-          <td>Oficio</td>
-          <td>OFICIO Nro. 03- 2024-PS-PJPL-CSJP-PJ.</td>
-          <td>24/01/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/1NE300hKe-dGGZHOB3g1w5-Kjq4OLj3y8/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/6thdocExample/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
+    <div class="form-group">
+      <label>N° Expediente *</label>
+      <input type="text" placeholder="Ingrese el número de expediente">
+    </div>
 
-        <tr>
-          <td>7</td>
-          <td>Reporte</td>
-          <td>REPORTE ECONÓMICO DEL DEMANDADO POR ALIMENTOS</td>
-          <td>05/02/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/1ViZB6SLsZI_BSk3WFTS4pcBuqPLWqtJ-/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/7thdocExample/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
+    <div class="form-group">
+      <label>Parte</label>
+      <input type="text" placeholder="Apellido paterno y materno o razón social">
+    </div>
+  </div>
 
-        <tr>
-          <td>8</td>
-          <td>Informe</td>
-          <td>Informacion de la planilla de pagos del demandado</td>
-          <td>05/02/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/1XBK3of7m41BMabjavwKqq-gNsSHm9d0e/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/8thdocExample/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
+  <!-- === FORMULARIO POR CÓDIGO === -->
+  <div id="form-codigo" class="formulario" style="display:none;">
 
-        <tr>
-          <td>9</td>
-          <td>Informe</td>
-          <td>informacion de registro de hijos menores de edad del demandado</td>
-          <td>19/03/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/1FasOMVxYeZskHeSYoDm2jO1L-C8amaBk/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/9thdocExample/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
+    <h4 style="text-align:center; margin-bottom:20px;">Código del Expediente</h4>
 
-        <tr>
-          <td>10</td>
-          <td>Acta</td>
-          <td>Acta de audiencia unica ( reprogramado)</td>
-          <td>26/03/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/18ZYxLMsLxq7YiksXOrDb5HCeIACus9FN/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/10thdocExample/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
-        <tr>
-          <td>11</td>
-          <td>Escrito</td>
-          <td>cumplo con remitir lo requerido</td>
-          <td>28/03/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/1CqIrbqZe4LHHoDOElh4FNDigitezN5Wm/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/1b2c3d4e5f6g7h8i9j0kLmNoPqRsTuVwXyZz/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
-        <tr>
-          <td>12</td>
-          <td>Resolucion</td>
-          <td>Resolucion N° 02</td>
-          <td>14/04/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/1ErTj06zzVMs9S15XWJQ3g_1ck97N-fGq/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/1b2c3d4e5f6g7h8i9j0kLmNoPqRsTuVwXyZz/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
-        <tr>
-          <td>13</td>
-          <td>Notificaion</td>
-          <td>Se notifica al demandado </td>
-          <td>29/04/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/1i_YRLPNVoqHvEp4sC5RsePW2jyGy9n3k/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/1b2c3d4e5f6g7h8i9j0kLmNoPqRsTuVwXyZz/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
-        <tr>
-          <td>14</td>
-          <td>Resolucion</td>
-          <td>Resolucion N° 3</td>
-          <td>13/05/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/1dBiAbSxgVwSNKNtWhGDp-b7qR1OMt3g3/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/1b2c3d4e5f6g7h8i9j0kLmNoPqRsTuVwXyZz/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
-        <tr>
-          <td>15</td>
-          <td>Notificacion</td>
-          <td>Notificacion</td>
-          <td>03/06/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/1OUXiH-e2c_klzpjIz54qgcg11l--BIsg/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/1b2c3d4e5f6g7h8i9j0kLmNoPqRsTuVwXyZz/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
-        <tr>
-          <td>16</td>
-          <td>Escrito</td>
-          <td>Contestacion de la demanda</td>
-          <td>12/06/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/1fI0_C3QikkSWKMV1zN4GdKir4uXZ7VCQ/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/1b2c3d4e5f6g7h8i9j0kLmNoPqRsTuVwXyZz/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
-        <tr>
-          <td>17</td>
-          <td>
-            Escrito
-          </td>
-          <td>Anexo de la contestacion de la demanda</td>
-          <td>12/06/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/1A1Yz_BYOa-z1lJZ5Xi7eIhASVoZuOOg-/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/1b2c3d4e5f6g7h8i9j0kLmNoPqRsTuVwXyZz/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
-        <tr>
-          <td>18</td>
-          <td>Resolucion</td>
-          <td>Resolucion N° 4</td>
-          <td>17/06/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/1oogDcRdTi0w2fwEi9UA5WX36EOwH4V2w/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/1b2c3d4e5f6g7h8i9j0kLmNoPqRsTuVwXyZz/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
-        <tr>
-          <td>19</td>
-          <td>Acta</td>
-          <td>Acta de audiencia</td>
-          <td>18/06/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/1p_HCo92ooCNn_A_MYSB9aASykcB0X7Cb/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/1b2c3d4e5f6g7h8i9j0kLmNoPqRsTuVwXyZz/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
-        <tr>
-          <td>20</td>
-          <td>Resolucion</td>
-          <td>Sentencia</td>
-          <td>24/06/2025</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary btn-ver-doc"
-              data-url="https://drive.google.com/file/d/1-0WcXuxt3ZVHiBl_CoqcjZ0t467-WYpn/preview">
-              👁️ Ver
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="https://docs.google.com/document/d/1b2c3d4e5f6g7h8i9j0kLmNoPqRsTuVwXyZz/export?format=pdf"
-               target="_blank">⬇️ Descargar</a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="form-group">
+      <label>Número completo *</label>
+      <input id="expediente-codigo" type="text" placeholder="Ejemplo: 01437-2025-0-2111-JP-FC-02">
+      <small>Ingrese el número completo tal como está registrado.</small>
+    </div>
+
+    <p id="msg-codigo" style="font-weight:600; margin-top:10px;"></p>
   </div>
 </div>
-
-<!-- 🔹 VISOR DE GOOGLE DRIVE (reutilizable) -->
-<div id="visorDrive">
-  <button id="cerrarVisor">✕</button>
-  <iframe id="iframeDrive"></iframe>
+<div id="recordatorio-expediente"
+     style="
+      margin: 20px auto;
+      padding: 15px;
+      width: 80%;
+      max-width: 600px;
+      background: #fff8e1;
+      border-left: 5px solid #ffb300;
+      border-radius: 6px;
+      color: #5a4600;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align:center;">
+  📌 <strong>Formato correcto del número de expediente:</strong><br>
+  <span style='font-size:17px;'>00001-2025-0-2111-JP-FC-02</span>
 </div>
 
-  </main>
-
-  <!-- FOOTER -->
-  <footer class="site-footer pt-5">
-    <div class="container pb-4">
-      <div class="row">
-        <div class="col-lg-5 mb-4">
-          <div class="h5 mb-1">poder judicial</div>
-          <div class="mb-2">Poder Judicial - Puno</div>
-          <div><strong>Dirección:</strong> Plaza de Armas, Jr. Deustua, Puno-Perú</div>
-          <div><strong>Horario:</strong> Lunes a Viernes, 08:00–13:00 y 14:00–15:00</div>
-        </div>
-        <div class="col-lg-4 mb-4">
-          <div class="h6 mb-2">Contacto</div>
-          <div>Teléfono: (+51) 957 734 361</div>
-          <div>Correo: poderjudicial@unap.edu.pe</div>
-          <div>Facebook: corte superor de justica </div>
-        </div>
-        <div class="col-lg-3 mb-4">
-          <div class="h6 mb-2">Síguenos</div>
-          <div class="social">
-            <a href="#" aria-label="WhatsApp">wa</a>
-            <a href="#" aria-label="Facebook">f</a>
-            <a href="#" aria-label="Correo">✉</a>
-          </div>
-        </div>
-      </div>
-      <div class="divider my-3"></div>
-      <div class="d-flex justify-content-center py-2">
-        <small>Poder judicial — Puno © 2025. Todos los derechos reservados.</small>
-      </div>
-    </div>
-  </footer>
-  <div id="visorDrive">
-    <button id="cerrarVisor">✕</button>
-    <iframe id="iframeDrive"
-      src="https://docs.google.com/document/d/1iawcB_Pfhs2eQiGui4xPk5YxxlXWSyaxSaqLkPuoVr8/preview">
-    </iframe>
+<!-- === CAPTCHA GLOBAL === -->
+<div class="captcha-container">
+  <div class="captcha-header">Validación de seguridad</div>
+  <div class="captcha">
+    <div id="captcha-text"></div>
+    <input id="captcha-input" type="text" placeholder="Código">
+    <button id="btn-refresh">🔄</button>
   </div>
-  <!-- PANEL LATERAL ACERCA DE MI (normal) -->
-  <div class="backdrop"></div>
-  <aside class="about-panel" aria-label="Panel Acerca de mí">
-    <div class="about-header">
-      <div class="about-title">
-        <img src="EP_Derecho.png" alt="Logo Escuela Profesional de Derecho">
-        <div>
-          <div class="fw-semibold">Acerca de mí</div>
-          <div class="about-sub">Información del estudiante</div>
-        </div>
-      </div>
-      <a class="btn-close" href="#top" aria-label="Cerrar">✕</a>
-    </div>
-    <div class="about-body">
-      <div class="about-field"><div class="label">Nombres</div><div class="value">Maribel Clarita Mamani Mamani</div></div>
-      <div class="about-field"><div class="label">Programa</div><div class="value">Derecho — IX Ciclo</div></div>
-      <div class="about-field"><div class="label">Correo</div><div class="value">[maribelclarita22@gmail.com]</div></div>
-      <div class="about-field"><div class="label">Teléfono</div><div class="value">+51 900635664</div></div>
-      <div class="about-field"><div class="label">Descripción</div><div class="value">Estudiante de  9no 'A' de la facultad de ciencias juridicas y politicas .</div></div>
-    </div>
-  </aside>
+  <p id="captcha-msg"></p>
 
-  <!-- PANEL LATERAL ACTIVADO POR :target -->
-  <div id="about">
-    <div class="backdrop"><a href="#top" style="display:block;width:100%;height:100%"></a></div>
-    <aside class="about-panel" aria-hidden="true">
-      <div class="about-header">
-        <div class="about-title">
-          <img src="EP_Derecho.png" alt="Logo Escuela Profesional de Derecho">
-          <div>
-            <div class="fw-semibold">Acerca de mí</div>
-            <div class="about-sub">Información del estudiante</div>
-          </div>
-        </div>
-        <a class="btn-close" href="#top">✕</a>
-      </div>
-      <div class="about-body">
-        <div class="about-title">
-            <img  src="clarita.png" 
-                  alt="Logo Escuela Profesional de Derecho"
-                  style="height:100px; width:auto;">
-        </div>
+  <button class="btn-consultar" id="btn-consultar">CONSULTAR</button>
+</div>
+<div id="recordatorio-expediente"
+     style="
+      margin: 20px auto;
+      padding: 15px;
+      width: 80%;
+      max-width: 600px;
+      background: #fff8e1;
+      border-left: 5px solid #ffb300;
+      border-radius: 6px;
+      color: #5a4600;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align:center;">
+  📌 <strong>Formato correcto del número de expediente:</strong><br>
+  <span style='font-size:17px;'>00001-2025-0-2111-JP-FC-02</span>
+</div>
 
-        <div class="about-field"><div class="label">Nombres</div><div class="value">Maribel Clarita Mamani Mamani</div></div>
-        <div class="about-field"><div class="label">Programa</div><div class="value">Derecho — IX Ciclo</div></div>
-        <div class="about-field"><div class="label">Correo</div><div class="value">maribelclarita22@gmail.com</div></div>
-        <div class="about-field"><div class="label">Teléfono</div><div class="value">+51 900635664</div></div>
-        <div class="about-field"><div class="label">Descripción</div><div class="value">Estudiante de  9no 'A' de la facultad de ciencias juridicas y politicas .</div></div>
-      </div>
-    </aside>
-  </div>
-  <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const detalle = document.getElementById('detalle-expediente');
-  const botones = document.querySelectorAll('.btn-show-detail');
-  const btnCerrar = document.getElementById('btn-cerrar-detalle');
+<footer>
+  * La búsqueda se deberá realizar ingresando el número, año y especialidad del expediente.
+</footer>
 
-  botones.forEach(boton => {
-    boton.addEventListener('click', () => {
-      detalle.style.display = 'block';
-      detalle.scrollIntoView({ behavior: 'smooth' });
-    });
-  });
-
-  btnCerrar.addEventListener('click', () => {
-    detalle.style.display = 'none';
-  });
+<script>
+/* ============================================================
+   CAMBIO ENTRE PESTAÑAS (Por filtros / Por código)
+   ============================================================ */
+document.getElementById("tab-filtros").addEventListener("click", () => {
+  document.getElementById("form-filtros").style.display = "block";
+  document.getElementById("form-codigo").style.display = "none";
+  document.getElementById("tab-filtros").classList.add("active");
+  document.getElementById("tab-codigo").classList.remove("active");
 });
-</script>
- <script>
-    document.addEventListener("DOMContentLoaded", () => {
-    const visor = document.getElementById("visorDrive");
-    const iframe = document.getElementById("iframeDrive");
-    const btnCerrar = document.getElementById("cerrarVisor");
-    
-    // Escuchar todos los botones "Ver"
-    document.querySelectorAll(".btn-ver-doc").forEach(boton => {
-      boton.addEventListener("click", () => {
-        const url = boton.getAttribute("data-url");
-        if (url) {
-          iframe.src = url;
-          visor.style.display = "flex";
-        }
-      });
-    });
 
-    // Cerrar visor
-    btnCerrar.addEventListener("click", () => {
-      visor.style.display = "none";
-      iframe.src = "";
-    });
+document.getElementById("tab-codigo").addEventListener("click", () => {
+  document.getElementById("form-filtros").style.display = "none";
+  document.getElementById("form-codigo").style.display = "block";
+  document.getElementById("tab-codigo").classList.add("active");
+  document.getElementById("tab-filtros").classList.remove("active");
+});
 
-    // Cierra el visor si se hace clic fuera del iframe
-    visor.addEventListener("click", (e) => {
-      if (e.target === visor) {
-        visor.style.display = "none";
-        iframe.src = "";
-      }
-    });
-  });
-document.addEventListener("DOMContentLoaded", () => {
-  const inputBusqueda = document.getElementById("input-busqueda");
-  const btnConsultar = document.getElementById("btn-consultar");
-  const mensajeError = document.getElementById("mensaje-error");
-  const seccionInicio = document.getElementById("inicio");
-  const seccionConsultar = document.getElementById("consultar");
-  const seccionExpedientes = document.getElementById("expedientes");
-  const detalleExpediente = document.getElementById("detalle-expediente");
+/* ============================================================
+   CAPTCHA
+   ============================================================ */
+function generarCaptcha() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let cap = "";
+  for (let i = 0; i < 5; i++) {
+    cap += chars[Math.floor(Math.random() * chars.length)];
+  }
+  document.getElementById("captcha-text").textContent = cap;
+  return cap;
+}
 
-  // Ocultar detalle al inicio
-  detalleExpediente.style.display = "none";
+let captchaActual = generarCaptcha();
 
-  // 🔹 Escuchar clic del botón “Consultar”
-  btnConsultar.addEventListener("click", () => {
-    const termino = inputBusqueda.value.trim().toLowerCase();
+document.getElementById("btn-refresh").addEventListener("click", () => {
+  captchaActual = generarCaptcha();
+  document.getElementById("captcha-msg").textContent = "";
+});
 
-    // Limpiar mensaje anterior
-    mensajeError.style.display = "none";
+/* ============================================================
+   VALIDACIÓN DEL FORMATO DE EXPEDIENTE — Poder Judicial
+   FORMATO EXACTO:
+   00001-2025-0-2111-JP-FC-02
+   ============================================================ */
 
-    if (termino === "") {
-      mensajeError.textContent = "⚠️ Ingrese un código o materia antes de consultar.";
-      mensajeError.style.display = "block";
+const regExpediente = /^[0-9]{5}-[0-9]{4}-0-[0-9]{4}-[A-Z]{2}-[A-Z]{2}-[0-9]{2}$/;
+
+/* ============================================================
+   BOTÓN CONSULTAR
+   ============================================================ */
+document.getElementById("btn-consultar").addEventListener("click", () => {
+
+  const inputCaptcha = document.getElementById("captcha-input").value.trim().toUpperCase();
+  const msg = document.getElementById("captcha-msg");
+
+  /* --- Validación de CAPTCHA --- */
+  if (inputCaptcha !== captchaActual) {
+    msg.style.color = "red";
+    msg.textContent = "❌ Código de seguridad incorrecto.";
+    return;
+  }
+
+  /* ============================================================
+     SI SE ESTÁ USANDO "POR CÓDIGO DE EXPEDIENTE"
+     ============================================================ */
+  if (document.getElementById("form-codigo").style.display === "block") {
+
+    const exp = document.getElementById("expediente-codigo").value.trim().toUpperCase();
+
+    if (!regExpediente.test(exp)) {
+      msg.style.color = "red";
+      msg.textContent = "⚠️ El expediente debe tener el formato EXACTO: 00001-2025-0-2111-JP-FC-02";
       return;
     }
 
-    // Ocultar secciones iniciales
-    seccionInicio.style.display = "none";
-    seccionConsultar.style.display = "none";
-    seccionExpedientes.style.display = "block";
+    msg.style.color = "green";
+    msg.textContent = "✔ Código válido. Cargando información...";
 
-    const tarjetas = document.querySelectorAll(".exp-card");
-    let encontrados = 0;
+    setTimeout(() => {
+      window.location.href = "detalle.html?exp=" + encodeURIComponent(exp);
+    }, 1500);
 
-    tarjetas.forEach(tarjeta => {
-      const codigo = tarjeta.querySelector(".exp-pill").textContent.toLowerCase();
-      const materia = tarjeta.querySelector(".fw-semibold").textContent.toLowerCase();
+    return;
+  }
 
-      if (codigo.includes(termino) || materia.includes(termino)) {
-        tarjeta.style.display = "flex";
-        encontrados++;
-      } else {
-        tarjeta.style.display = "none";
-      }
-    });
+  /* ============================================================
+     SI SE ESTÁ USANDO "POR FILTROS"
+     ============================================================ */
 
-    if (encontrados === 0) {
-      mensajeError.textContent = "⚠️ No se encontró ningún expediente, vuelva a ingresar los datos.";
-      mensajeError.style.display = "block";
-      seccionInicio.style.display = "none";
-      seccionConsultar.style.display = "block";
-      seccionExpedientes.style.display = "none";
+  const expedienteInput = document.querySelector('input[placeholder="Ingrese el número de expediente"]');
+
+  if (expedienteInput) {
+    const exp = expedienteInput.value.trim().toUpperCase();
+
+    if (!regExpediente.test(exp)) {
+      msg.style.color = "red";
+      msg.textContent = "⚠️ Ingrese el número en formato válido: 00001-2025-0-2111-JP-FC-02";
+      return;
     }
-  });
+  }
 
-  // 🔹 Ocultar mensaje de error cuando el usuario escribe
-  inputBusqueda.addEventListener("input", () => {
-    mensajeError.style.display = "none";
-  });
+  msg.style.color = "green";
+  msg.textContent = "✔ Consulta válida. Procesando...";
 
-  // 🔹 Mostrar tabla de detalle solo al hacer clic en “Ver”
-  const botonesVer = document.querySelectorAll(".btn-show-detail");
-  botonesVer.forEach(boton => {
-    boton.addEventListener("click", () => {
-      detalleExpediente.style.display = "block";
-      detalleExpediente.scrollIntoView({ behavior: "smooth" });
-    });
-  });
-
-
+  setTimeout(() => {
+    window.location.href = "detalle.html";
+  }, 1500);
 });
 
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+/* ============================================================
+   AUTOCOMPLETAR ESPACIOS EN MAYÚSCULA
+   (Convierte automáticamente a mayúsculas)
+   ============================================================ */
+const autoUpper = document.getElementById("expediente-codigo");
+if (autoUpper) {
+  autoUpper.addEventListener("input", () => {
+    autoUpper.value = autoUpper.value.toUpperCase();
+  });
+}
+</script>
+
+
 </body>
-</html> 
-
-
-
-
-
+</html>
