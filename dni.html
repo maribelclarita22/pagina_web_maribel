@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta DNI Perú</title>
+    <style>
+        /* ESTILOS GENERALES (Estilo Poder Judicial) */
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* TARJETA DEL MODULO */
+        .card-consulta {
+            background: white;
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-top: 6px solid #8B0000; /* Rojo institucional */
+        }
+
+        .card-consulta h2 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.4rem;
+        }
+
+        /* INPUTS Y BOTONES */
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #8B0000;
+        }
+
+        .btn-buscar {
+            background-color: #8B0000;
+            color: white;
+            border: none;
+            padding: 0 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-buscar:hover {
+            background-color: #a00000;
+        }
+
+        .btn-buscar:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* RESULTADOS */
+        .resultados {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
+        .campo {
+            margin-bottom: 15px;
+        }
+
+        .campo:last-child {
+            margin-bottom: 0;
+        }
+
+        .campo label {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .campo input {
+            width: 100%;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            color: #333;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+        /* MENSAJES DE ERROR */
+        #mensajeError {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 15px;
+            display: none;
+            border: 1px solid #ffcdd2;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card-consulta">
+        <h2>Consulta de Datos - DNI</h2>
+        
+        <div id="mensajeError"></div>
+
+        <div class="input-group">
+            <input type="text" id="dniInput" placeholder="Ingrese DNI (8 dígitos)" maxlength="8" oninput="soloNumeros(this)">
+            <button class="btn-buscar" onclick="buscarDNI()" id="btnBuscar">BUSCAR</button>
+        </div>
+
+        <div class="resultados">
+            <div class="campo">
+                <label>Nombres:</label>
+                <input type="text" id="txtNombres" readonly placeholder="...">
+            </div>
+            <div class="campo">
+                <label>Apellido Paterno:</label>
+                <input type="text" id="txtPaterno" readonly placeholder="...">
+            </div>
+            <div class="campo">
+                <label>Apellido Materno:</label>
+                <input type="text" id="txtMaterno" readonly placeholder="...">
+            </div>
+        </div>
+    </div><script>
+        function soloNumeros(input) {
+            input.value = input.value.replace(/[^0-9]/g, '');
+        }
+
+        async function buscarDNI() {
+            const dni = document.getElementById('dniInput').value;
+            const btn = document.getElementById('btnBuscar');
+            const errorMsg = document.getElementById('mensajeError');
+            
+            const txtNombres = document.getElementById('txtNombres');
+            const txtPaterno = document.getElementById('txtPaterno');
+            const txtMaterno = document.getElementById('txtMaterno');
+
+            // Limpieza
+            txtNombres.value = "";
+            txtPaterno.value = "";
+            txtMaterno.value = "";
+            errorMsg.style.display = 'none';
+
+            if (dni.length !== 8) {
+                errorMsg.innerText = "⚠️ El DNI debe tener 8 dígitos.";
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            btn.innerText = "Cargando...";
+            btn.disabled = true;
+
+            // --- INTENTO CON LA OTRA URL (ApiPeru.dev) ---
+            const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImZyYW5rbWVuZG96YXl0czI1MThAZ21haWwuY29tIn0.vKGyh2NtkPl472-FY5Mop-I7DuOCt2Iq02KS2E-iZio';
+            
+            // Esta URL suele ser más amigable y permite poner el token directo en el link
+            const url = `https://apiperu.dev/api/dni/${dni}?api_token=${token}`;
+
+            try {
+                // Quitamos los headers complejos para evitar bloqueos CORS simples
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error("No se pudo conectar o DNI incorrecto.");
+                }
+
+                const data = await response.json();
+
+                // ApiPeru.dev devuelve los datos dentro de "data"
+                if (data.success && data.data) {
+                    txtNombres.value = data.data.nombres;
+                    txtPaterno.value = data.data.apellido_paterno;
+                    txtMaterno.value = data.data.apellido_materno;
+                } else {
+                    throw new Error("No se encontraron datos.");
+                }
+
+            } catch (error) {
+                console.error("Error:", error);
+                errorMsg.innerHTML = `❌ Error de conexión.<br><small>Si estás abriendo el archivo localmente, intenta subirlo a GitHub.</small>`;
+                errorMsg.style.display = 'block';
+            } finally {
+                btn.innerText = "BUSCAR";
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
