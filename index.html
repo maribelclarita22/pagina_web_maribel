@@ -145,7 +145,7 @@ small {
   border-radius: 8px;
   padding: 20px;
   margin: 20px auto;
-  width: 80%;
+  width: 60%;
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 .captcha-header {
@@ -196,10 +196,20 @@ small {
 }
 
 footer {
-  text-align: center;
-  font-size: 12px;
-  color: #555;
-  margin: 20px 0;
+    background-color: #8B0000; /* Rojo oscuro */
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+footer p {
+    margin: 5px 0;
 }
 #session-timer-box {
     background-color: #770909; /* Un rojo oscuro */
@@ -214,6 +224,12 @@ footer {
 /* Asegura que el texto "Fecha:" y "Hora:" también estén en la misma línea */
 #session-timer-box p {
     margin: 0; 
+}
+.centro {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 38vh; /* Altura del contenedor */
 }
 </style>
 </head>
@@ -349,8 +365,12 @@ footer {
     </div>
 
     <p id="msg-codigo" style="font-weight:600; margin-top:10px;"></p>
+    <div class ="centro">
+      <img src="cej.png" alt="Logo">
+    </div>
   </div>
 </div>
+
 <div id="recordatorio-expediente"
      style="
       margin: 20px auto;
@@ -391,7 +411,11 @@ footer {
 </div>
 
 <footer>
-  * La búsqueda se deberá realizar ingresando el número, año y especialidad del expediente.
+    <div class="footer-content">
+        <p>Al Pase de Payetillas, S/N, Patio de Justicia, Cercado, Lima - Perú</p>
+        <p>&copy; 2025 Todos los derechos reservados</p>
+        <p>Recomendado para Mozilla, Nubia, Safari, Explorer y versiones superiores</p>
+    </div>
 </footer>
 
 <script>
