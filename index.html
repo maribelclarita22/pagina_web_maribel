@@ -231,6 +231,18 @@ footer p {
     align-items: center;
     height: 38vh; /* Altura del contenedor */
 }
+   .card-consulta { 
+        background: white; width: 100%; max-width: 400px; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 5px solid #8B0000; }
+        h2 { text-align: center; color: #333; margin-top: 0; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+        button { background: #8B0000; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #a00000; }
+        button:disabled { background: #ccc; }
+        .resultados input { width: 100%; margin-bottom: 10px; background: #f9f9f9; box-sizing: border-box; padding: 8px; border: 1px solid #ddd; }
+        label { font-size: 12px; font-weight: bold; color: #666; display: block; margin-bottom: 3px; }
+        #mensajeError { color: #d32f2f; font-size: 13px; text-align: center; margin-bottom: 10px; display: none; background: #ffebee; padding: 10px; border-radius: 4px; border: 1px solid #ffcdd2;}
+
 </style>
 </head>
 <body>
@@ -347,9 +359,22 @@ footer p {
       <input type="text" placeholder="Ingrese el número de expediente">
     </div>
 
-    <div class="form-group">
-      <label>Parte</label>
-      <input type="text" placeholder="Apellido paterno y materno o razón social">
+    <div id="mensajeError"></div>
+
+    <div class="input-group">
+      <label>Ingrese su numero de DNI *</label>
+
+            <input type="text" id="dniInput" placeholder="Ingrese el numero de DNI" maxlength="8">
+            <button onclick="buscarDNI()" id="btnBuscar">BUSCAR</button>
+    </div>
+
+    <div class="resultados">
+            <label>Nombres:</label>
+            <input type="text" id="txtNombres" readonly>
+            <label>Apellido Paterno:</label>
+            <input type="text" id="txtPaterno" readonly>
+            <label>Apellido Materno:</label>
+            <input type="text" id="txtMaterno" readonly>
     </div>
   </div>
 
@@ -359,7 +384,7 @@ footer p {
     <h4 style="text-align:center; margin-bottom:20px;">Código del Expediente</h4>
 
     <div class="form-group">
-      <label>Número completo </label>
+      <label>Número completo *</label>
       <input id="expediente-codigo" type="text" placeholder="Ejemplo: 01437-2025-0-2111-JP-FC-02">
       <small>Ingrese el número completo tal como está registrado.</small>
     </div>
@@ -564,9 +589,76 @@ updateDateTime();
 
 // Luego, configura un intervalo para llamar a la función cada 1000 milisegundos (1 segundo)
 setInterval(updateDateTime, 1000);
+
+        async function buscarDNI() {
+            const dni = document.getElementById('dniInput').value;
+            const btn = document.getElementById('btnBuscar');
+            const errorMsg = document.getElementById('mensajeError');
+            
+            // Limpiar campos
+            document.getElementById('txtNombres').value = "";
+            document.getElementById('txtPaterno').value = "";
+            document.getElementById('txtMaterno').value = "";
+            errorMsg.style.display = 'none';
+
+            if (dni.length !== 8) {
+                errorMsg.innerHTML = "⚠️ El DNI debe tener 8 dígitos.";
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            btn.innerText = "Buscando...";
+            btn.disabled = true;
+
+            // --- TOKEN Y URL CON PROXY ---
+            const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImZyYW5rbWVuZG96YXl0czI1MThAZ21haWwuY29tIn0.vKGyh2NtkPl472-FY5Mop-I7DuOCt2Iq02KS2E-iZio';
+            
+            // 1. URL Original de la API
+            const apiUrl = `https://api.apis.net.pe/v1/dni?numero=${dni}`;
+            
+            // 2. Usamos un Proxy público para saltar el bloqueo CORS del navegador
+            // "corsproxy.io" reenvía tu petición limpiando los bloqueos
+            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
+
+            try {
+                const response = await fetch(proxyUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Cache-Control': 'no-cache' // Evitar caché antigua
+                    }
+                });
+
+                // Si la respuesta no es OK (ej: 401 Token inválido, 404 No encontrado)
+                if (!response.ok) {
+                    if(response.status === 401) throw new Error("El Token ha vencido o es inválido.");
+                    if(response.status === 429) throw new Error("Has excedido el límite de consultas.");
+                    throw new Error(`Error del servidor: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Validamos los datos recibidos
+                if (data && data.nombres) {
+                    document.getElementById('txtNombres').value = data.nombres;
+                    document.getElementById('txtPaterno').value = data.apellidoPaterno;
+                    document.getElementById('txtMaterno').value = data.apellidoMaterno;
+                } else {
+                    throw new Error("DNI no encontrado en la base de datos.");
+                }
+
+            } catch (error) {
+                console.error("Detalle del error:", error);
+                // Mostrar el error específico en pantalla
+                errorMsg.innerHTML = `❌ <b>Fallo:</b> ${error.message}<br><small>Revisa la consola (F12) para más detalles.</small>`;
+                errorMsg.style.display = 'block';
+            } finally {
+                btn.innerText = "BUSCAR";
+                btn.disabled = false;
+            }
+        }
 </script>
 
 
 </body>
 </html>
-
