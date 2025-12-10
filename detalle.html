@@ -216,7 +216,20 @@ h4, h3, h2 {
   border-color: #800000;
   box-shadow: 0 3px 8px rgba(0,0,0,0.2);
 }
-
+#session-timer-box {
+    background-color: #580707; /* Un rojo oscuro */
+    color: white;
+    padding: 0px;
+    width: fit-content;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    margin: 5px;
+}
+/* Asegura que el texto "Fecha:" y "Hora:" también estén en la misma línea */
+#session-timer-box p {
+    margin: 0; 
+}
 </style>
 </head>
 <body>
@@ -235,9 +248,19 @@ h4, h3, h2 {
     </div>
   </div>
 </nav>
+<nav class="navbar">
+  <div class="container">
+    <a class="navbar-brand" href="#">
+     
+    </a>
+    <div id="session-timer-box">
+        <p>Fecha: <span id="current-date"></span> Hora: <span id="current-time"></span></p>
+    </div>
+  </div>
+</nav>
 
 <main class="container my-5">
-  <h3 class="text-center fw-bold mb-4">Detalle del Expediente Judicial</h3>
+  <h3 class="text-center fw-bold mb-4">Detalles del Expediente Judicial</h3>
 
 <!-- Información del Expediente -->
 <div class="card mb-4 border-0 shadow-sm">
@@ -627,11 +650,15 @@ h4, h3, h2 {
 </main>
 
 <footer>
-  Poder Judicial — Puno © 2025. Todos los derechos reservados.
+    <div class="footer-content">
+        <p>Al Pase de Payetillas, S/N, Patio de Justicia, Cercado, Lima - Perú</p>
+        <p>&copy; 2025 Todos los derechos reservados</p>
+        <p>Recomendado para Mozilla, Nubia, Safari, Explorer y versiones superiores</p>
+    </div>
 </footer>
 <script>
 // 🔐 Tiempo de sesión (5 minutos = 300 segundos)
-let tiempoRestante = 3000; // segundos
+let tiempoRestante = 1200; // segundos
 const aviso = document.createElement("div");
 
 // Estilos del aviso
@@ -658,7 +685,7 @@ const intervalo = setInterval(() => {
   if (tiempoRestante <= 0) {
     clearInterval(intervalo);
     alert("⚠️ Tu sesión ha expirado por seguridad. Vuelve a iniciar una nueva consulta.");
-    window.location.href = "resultado.html"; // redirige al inicio
+    window.location.href = "index.html"; // redirige al inicio
   }
 }, 1000);
 
@@ -711,6 +738,34 @@ document.querySelectorAll(".btn-filtro").forEach(btn => {
   });
 });
 
+function updateDateTime() {
+    const now = new Date(); // Crea un nuevo objeto de Fecha y Hora
+
+    // --- Formateo de la Fecha (05/12/2025) ---
+    // Nota: El año 2025 en la imagen es una fecha fija. Aquí se muestra la fecha actual.
+    const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    // Usamos 'es-ES' para el formato DD/MM/AAAA
+    let dateString = now.toLocaleDateString('es-ES', dateOptions);
+
+    // --- Formateo de la Hora (20:08:03) ---
+    const timeOptions = { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit', 
+        hour12: false // Para usar el formato 24 horas
+    };
+    let timeString = now.toLocaleTimeString('es-ES', timeOptions);
+
+    // 4. Actualizar la Vista
+    document.getElementById('current-date').textContent = dateString;
+    document.getElementById('current-time').textContent = timeString;
+}
+
+// Llama a la función inmediatamente para mostrar la hora al cargar la página
+updateDateTime(); 
+
+// Luego, configura un intervalo para llamar a la función cada 1000 milisegundos (1 segundo)
+setInterval(updateDateTime, 1000);
 </script>
 
 </body>
