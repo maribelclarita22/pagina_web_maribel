@@ -3,218 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consulta DNI Perú</title>
+    <title>Turismo Puno Genético - Acceso</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* ESTILOS GENERALES (Estilo Poder Judicial) */
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        /* TARJETA DEL MODULO */
-        .card-consulta {
-            background: white;
-            width: 100%;
-            max-width: 450px;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            border-top: 6px solid #8B0000; /* Rojo institucional */
-        }
-
-        .card-consulta h2 {
-            text-align: center;
-            color: #333;
-            margin-top: 0;
-            margin-bottom: 25px;
-            font-size: 1.4rem;
-        }
-
-        /* INPUTS Y BOTONES */
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .input-group input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        .input-group input:focus {
-            border-color: #8B0000;
-        }
-
-        .btn-buscar {
-            background-color: #8B0000;
-            color: white;
-            border: none;
-            padding: 0 25px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 14px;
-            transition: background 0.3s;
-        }
-
-        .btn-buscar:hover {
-            background-color: #a00000;
-        }
-
-        .btn-buscar:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-        /* RESULTADOS */
-        .resultados {
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #eee;
-        }
-
-        .campo {
-            margin-bottom: 15px;
-        }
-
-        .campo:last-child {
-            margin-bottom: 0;
-        }
-
-        .campo label {
-            display: block;
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-
-        .campo input {
-            width: 100%;
-            padding: 10px;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            color: #333;
-            font-size: 15px;
-            box-sizing: border-box;
-        }
-
-        /* MENSAJES DE ERROR */
-        #mensajeError {
-            color: #d32f2f;
-            background-color: #ffebee;
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 14px;
-            text-align: center;
-            margin-bottom: 15px;
-            display: none;
-            border: 1px solid #ffcdd2;
-        }
+        body { background-color: #f0f2f5; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .card { width: 400px; border: none; shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="card-consulta">
-        <h2>Consulta de Datos - DNI</h2>
+<div class="card p-4">
+    <h3 class="text-center mb-4">🧬 Rutas Puno</h3>
+
+    <div id="login-view">
+        <form id="form-login">
+            <div class="mb-3">
+                <label>Email</label>
+                <input type="email" id="login-email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Contraseña</label>
+                <input type="password" id="login-password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+        </form>
+        <p class="mt-3 text-center">
+            ¿No tienes cuenta? <a href="#" onclick="toggleView()">Regístrate aquí</a>
+        </p>
+    </div>
+
+    <div id="register-view" class="hidden">
+        <h5 class="mb-3">Nuevo Usuario</h5>
         
-        <div id="mensajeError"></div>
-
-        <div class="input-group">
-            <input type="text" id="dniInput" placeholder="Ingrese DNI (8 dígitos)" maxlength="8" oninput="soloNumeros(this)">
-            <button class="btn-buscar" onclick="buscarDNI()" id="btnBuscar">BUSCAR</button>
+        <div class="mb-3">
+            <label class="form-label">Soy Turista:</label>
+            <select id="tipo-turista" class="form-select" onchange="cambiarFormulario()">
+                <option value="Nacional">Nacional (Perú)</option>
+                <option value="Extranjero">Extranjero</option>
+            </select>
         </div>
 
-        <div class="resultados">
-            <div class="campo">
-                <label>Nombres:</label>
-                <input type="text" id="txtNombres" readonly placeholder="...">
-            </div>
-            <div class="campo">
-                <label>Apellido Paterno:</label>
-                <input type="text" id="txtPaterno" readonly placeholder="...">
-            </div>
-            <div class="campo">
-                <label>Apellido Materno:</label>
-                <input type="text" id="txtMaterno" readonly placeholder="...">
+        <div id="seccion-dni">
+            <div class="input-group mb-3">
+                <input type="text" id="dni" class="form-control" placeholder="Ingresa DNI" maxlength="8">
+                <button class="btn btn-outline-secondary" type="button" onclick="consultarDNI()">🔍 Buscar</button>
             </div>
         </div>
-    </div><script>
-        function soloNumeros(input) {
-            input.value = input.value.replace(/[^0-9]/g, '');
+
+        <div class="mb-3">
+            <label>Nombre Completo</label>
+            <input type="text" id="nombre" class="form-control" required> </div>
+
+        <div class="mb-3">
+            <label>Email</label>
+            <input type="email" id="reg-email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Contraseña</label>
+            <input type="password" id="reg-password" class="form-control" required>
+        </div>
+
+        <button onclick="registrarUsuario()" class="btn btn-success w-100">Crear Cuenta</button>
+        
+        <p class="mt-3 text-center">
+            <a href="#" onclick="toggleView()">Volver al Login</a>
+        </p>
+    </div>
+</div>
+
+<script>
+    // --- 1. CONFIGURACIÓN SUPABASE ---
+    const SUPABASE_URL = "https://mjfnexguestyrlbxayvb.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qZm5leGd1ZXN0eXJsYnhheXZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NTcyMTMsImV4cCI6MjA4MjQzMzIxM30.EAyJsgGr44Zs5uFP7FrYTZNNUsKkuXfvT5Ize14zxrs"; // Tu key correcta
+    
+    // CORRECCIÓN AQUÍ: Usamos 'client' o 'supabaseClient' para no chocar con la librería
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // --- 2. LÓGICA DE INTERFAZ ---
+    function toggleView() {
+        document.getElementById('login-view').classList.toggle('hidden');
+        document.getElementById('register-view').classList.toggle('hidden');
+    }
+
+    function cambiarFormulario() {
+        const tipo = document.getElementById('tipo-turista').value;
+        const seccionDni = document.getElementById('seccion-dni');
+        const inputNombre = document.getElementById('nombre');
+
+        if (tipo === 'Extranjero') {
+            seccionDni.classList.add('hidden');
+            inputNombre.readOnly = false;
+            inputNombre.value = "";
+            inputNombre.placeholder = "Ingresa tu nombre";
+        } else {
+            seccionDni.classList.remove('hidden');
+            inputNombre.readOnly = true;
+            inputNombre.placeholder = "Se llenará al buscar DNI";
+        }
+    }
+
+// --- 3. API DE DNI (CON TU TOKEN REAL DE APIPERU.DEV) ---
+    async function consultarDNI() {
+        const dniInput = document.getElementById('dni');
+        const dni = dniInput.value;
+        const nombreInput = document.getElementById('nombre');
+        
+        // Validar longitud
+        if (dni.length !== 8) {
+            return alert("El DNI debe tener 8 dígitos exactos.");
         }
 
-        async function buscarDNI() {
-            const dni = document.getElementById('dniInput').value;
-            const btn = document.getElementById('btnBuscar');
-            const errorMsg = document.getElementById('mensajeError');
+        // Token y URL que me diste
+        const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImZyYW5rbWVuZG96YXl0czI1MThAZ21haWwuY29tIn0.vKGyh2NtkPl472-FY5Mop-I7DuOCt2Iq02KS2E-iZio';
+        const url = `https://apiperu.dev/api/dni/${dni}?api_token=${token}`;
+
+        try {
+            // Feedback visual (Opcional: cambia el cursor o deshabilita botones)
+            nombreInput.placeholder = "⏳ Consultando RENIEC...";
             
-            const txtNombres = document.getElementById('txtNombres');
-            const txtPaterno = document.getElementById('txtPaterno');
-            const txtMaterno = document.getElementById('txtMaterno');
-
-            // Limpieza
-            txtNombres.value = "";
-            txtPaterno.value = "";
-            txtMaterno.value = "";
-            errorMsg.style.display = 'none';
-
-            if (dni.length !== 8) {
-                errorMsg.innerText = "⚠️ El DNI debe tener 8 dígitos.";
-                errorMsg.style.display = 'block';
-                return;
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error("Error en la respuesta del servidor");
             }
 
-            btn.innerText = "Cargando...";
-            btn.disabled = true;
+            const resultado = await response.json();
 
-            // --- INTENTO CON LA OTRA URL (ApiPeru.dev) ---
-            const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImZyYW5rbWVuZG96YXl0czI1MThAZ21haWwuY29tIn0.vKGyh2NtkPl472-FY5Mop-I7DuOCt2Iq02KS2E-iZio';
-            
-            // Esta URL suele ser más amigable y permite poner el token directo en el link
-            const url = `https://apiperu.dev/api/dni/${dni}?api_token=${token}`;
-
-            try {
-                // Quitamos los headers complejos para evitar bloqueos CORS simples
-                const response = await fetch(url);
-
-                if (!response.ok) {
-                    throw new Error("No se pudo conectar o DNI incorrecto.");
-                }
-
-                const data = await response.json();
-
-                // ApiPeru.dev devuelve los datos dentro de "data"
-                if (data.success && data.data) {
-                    txtNombres.value = data.data.nombres;
-                    txtPaterno.value = data.data.apellido_paterno;
-                    txtMaterno.value = data.data.apellido_materno;
-                } else {
-                    throw new Error("No se encontraron datos.");
-                }
-
-            } catch (error) {
-                console.error("Error:", error);
-                errorMsg.innerHTML = `❌ Error de conexión.<br><small>Si estás abriendo el archivo localmente, intenta subirlo a GitHub.</small>`;
-                errorMsg.style.display = 'block';
-            } finally {
-                btn.innerText = "BUSCAR";
-                btn.disabled = false;
+            // La API suele devolver { success: true, data: { ... } }
+            if (resultado.success) {
+                const persona = resultado.data;
+                // Concatenamos Nombres + Apellido P + Apellido M
+                const nombreCompleto = `${persona.nombres} ${persona.apellido_paterno} ${persona.apellido_materno}`;
+                
+                nombreInput.value = nombreCompleto;
+                alert(`✅ Encontrado: ${nombreCompleto}`);
+            } else {
+                alert("❌ DNI no encontrado o no existe.");
+                nombreInput.value = "";
             }
+
+        } catch (error) {
+            console.error("Error API:", error);
+            alert("Hubo un problema al conectar con la API de DNI.");
+            nombreInput.placeholder = "Intenta escribir el nombre manualmente";
+            nombreInput.readOnly = false; // Permitimos escribir si falla la API
         }
-    </script>
+    }
+    // --- 4. REGISTRO EN SUPABASE ---
+    async function registrarUsuario() {
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+        const nombre = document.getElementById('nombre').value;
+        const tipo = document.getElementById('tipo-turista').value;
+        const dni = document.getElementById('dni').value;
+
+        if (!email || !password || !nombre) return alert("Completa todos los datos");
+
+        // A. Crear usuario en Auth (USAMOS supabaseClient)
+        const { data, error } = await supabaseClient.auth.signUp({
+            email: email,
+            password: password
+        });
+
+        if (error) return alert("Error registro: " + error.message);
+
+        // B. Guardar datos extra en tabla 'perfiles'
+        const { error: perfilError } = await supabaseClient
+            .from('perfiles')
+            .insert([{
+                id: data.user.id, // El ID que generó Supabase Auth
+                nombre_completo: nombre,
+                tipo_turista: tipo,
+                dni: tipo === 'Nacional' ? dni : null,
+                pais: tipo === 'Extranjero' ? 'Extranjero' : 'Perú'
+            }]);
+
+        if (perfilError) {
+            alert("Usuario creado pero error al guardar perfil: " + perfilError.message);
+        } else {
+            alert("✅ ¡Registro Exitoso! Ahora puedes iniciar sesión.");
+            toggleView();
+        }
+    }
+
+    // --- 5. LOGIN ---
+    document.getElementById('form-login').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+
+        // USAMOS supabaseClient AQUÍ TAMBIÉN
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+
+        if (error) {
+            alert("Error: " + error.message);
+        } else {
+            alert("👋 Bienvenido al sistema, " + data.user.email);
+            // window.location.href = "mapa.html"; 
+        }
+    });
+</script>
 </body>
 </html>
