@@ -3,88 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Turismo Puno Genético - Acceso</title>
+    <title>🧬 Rutas Puno - Acceso Inteligente</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background-color: #f0f2f5; height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .card { width: 400px; border: none; shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        body { 
+            background-color: #f0f2f5; 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .card-main { 
+            width: 100%; 
+            max-width: 450px; 
+            border: none; 
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            overflow: hidden;
+        }
+        .card-header-custom {
+            background-color: #8B0000; /* Rojo Puno/Institucional */
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .card-body { padding: 30px; background: white; }
         .hidden { display: none; }
+        .btn-puno { background-color: #8B0000; color: white; border: none; }
+        .btn-puno:hover { background-color: #a00000; color: white; }
+        .input-group-text { background-color: #f8f9fa; }
     </style>
 </head>
 <body>
 
-<div class="card p-4">
-    <h3 class="text-center mb-4">🧬 Rutas Puno</h3>
-
-    <div id="login-view">
-        <form id="form-login">
-            <div class="mb-3">
-                <label>Email</label>
-                <input type="email" id="login-email" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label>Contraseña</label>
-                <input type="password" id="login-password" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Ingresar</button>
-        </form>
-        <p class="mt-3 text-center">
-            ¿No tienes cuenta? <a href="#" onclick="toggleView()">Regístrate aquí</a>
-        </p>
+<div class="card-main">
+    <div class="card-header-custom">
+        <h3 class="m-0">🧬 Rutas Genéticas Puno</h3>
+        <small>Algoritmo de Optimización Turística</small>
     </div>
 
-    <div id="register-view" class="hidden">
-        <h5 class="mb-3">Nuevo Usuario</h5>
+    <div class="card-body">
         
-        <div class="mb-3">
-            <label class="form-label">Soy Turista:</label>
-            <select id="tipo-turista" class="form-select" onchange="cambiarFormulario()">
-                <option value="Nacional">Nacional (Perú)</option>
-                <option value="Extranjero">Extranjero</option>
-            </select>
+        <div id="login-view">
+            <h5 class="text-center mb-4 text-muted">Iniciar Sesión</h5>
+            <form id="form-login">
+                <div class="mb-3">
+                    <label class="form-label">Correo Electrónico</label>
+                    <input type="email" id="login-email" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" id="login-password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-puno w-100 py-2">INGRESAR</button>
+            </form>
+            <p class="mt-4 text-center small">
+                ¿Nuevo usuario? <a href="#" onclick="toggleView()" class="text-danger fw-bold">Regístrate aquí</a>
+            </p>
         </div>
 
-        <div id="seccion-dni">
-            <div class="input-group mb-3">
-                <input type="text" id="dni" class="form-control" placeholder="Ingresa DNI" maxlength="8">
-                <button class="btn btn-outline-secondary" type="button" onclick="consultarDNI()">🔍 Buscar</button>
+        <div id="register-view" class="hidden">
+            <h5 class="text-center mb-3 text-muted">Crear Cuenta</h5>
+            
+            <div class="mb-3">
+                <label class="form-label fw-bold">Soy Turista:</label>
+                <select id="tipo-turista" class="form-select" onchange="cambiarFormulario()">
+                    <option value="Nacional">🇵🇪 Nacional (DNI)</option>
+                    <option value="Extranjero">🌎 Extranjero</option>
+                </select>
             </div>
-        </div>
 
-        <div class="mb-3">
-            <label>Nombre Completo</label>
-            <input type="text" id="nombre" class="form-control" required> </div>
+            <div id="seccion-dni">
+                <label class="form-label">Número de DNI</label>
+                <div class="input-group mb-3">
+                    <input type="text" id="dni" class="form-control" placeholder="8 dígitos" maxlength="8" oninput="soloNumeros(this)">
+                    <button class="btn btn-outline-secondary" type="button" id="btnBuscarDNI" onclick="consultarDNI()">
+                        🔍 Buscar
+                    </button>
+                </div>
+                <div id="mensajeError" class="text-danger small mb-2 text-center" style="display:none;"></div>
+            </div>
 
-        <div class="mb-3">
-            <label>Email</label>
-            <input type="email" id="reg-email" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label>Contraseña</label>
-            <input type="password" id="reg-password" class="form-control" required>
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Nombre Completo</label>
+                <input type="text" id="nombre" class="form-control bg-light" readonly placeholder="Se llenará automáticamente">
+            </div>
 
-        <button onclick="registrarUsuario()" class="btn btn-success w-100">Crear Cuenta</button>
-        
-        <p class="mt-3 text-center">
-            <a href="#" onclick="toggleView()">Volver al Login</a>
-        </p>
+            <div class="mb-3">
+                <label class="form-label">Correo Electrónico</label>
+                <input type="email" id="reg-email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Crear Contraseña</label>
+                <input type="password" id="reg-password" class="form-control" required>
+            </div>
+
+            <button onclick="registrarUsuario()" id="btnRegistrar" class="btn btn-puno w-100 py-2">REGISTRARSE</button>
+            
+            <p class="mt-4 text-center small">
+                ¿Ya tienes cuenta? <a href="#" onclick="toggleView()" class="text-danger fw-bold">Inicia Sesión</a>
+            </p>
+        </div>
     </div>
 </div>
 
 <script>
     // --- 1. CONFIGURACIÓN SUPABASE ---
     const SUPABASE_URL = "https://mjfnexguestyrlbxayvb.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qZm5leGd1ZXN0eXJsYnhheXZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NTcyMTMsImV4cCI6MjA4MjQzMzIxM30.EAyJsgGr44Zs5uFP7FrYTZNNUsKkuXfvT5Ize14zxrs"; // Tu key correcta
+    // Tu Key 'anon' (pública):
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qZm5leGd1ZXN0eXJsYnhheXZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NTcyMTMsImV4cCI6MjA4MjQzMzIxM30.EAyJsgGr44Zs5uFP7FrYTZNNUsKkuXfvT5Ize14zxrs"; 
     
-    // CORRECCIÓN AQUÍ: Usamos 'client' o 'supabaseClient' para no chocar con la librería
+    // IMPORTANTE: Usamos una variable distinta para no chocar con la librería
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- 2. LÓGICA DE INTERFAZ ---
+    // --- 2. UTILIDADES VISUALES ---
     function toggleView() {
         document.getElementById('login-view').classList.toggle('hidden');
         document.getElementById('register-view').classList.toggle('hidden');
+        document.getElementById('mensajeError').style.display = 'none';
+    }
+
+    function soloNumeros(input) {
+        input.value = input.value.replace(/[^0-9]/g, '');
     }
 
     function cambiarFormulario() {
@@ -96,84 +138,102 @@
             seccionDni.classList.add('hidden');
             inputNombre.readOnly = false;
             inputNombre.value = "";
-            inputNombre.placeholder = "Ingresa tu nombre";
+            inputNombre.classList.remove('bg-light'); // Quitar fondo gris
+            inputNombre.placeholder = "Ingresa tu nombre completo";
         } else {
             seccionDni.classList.remove('hidden');
             inputNombre.readOnly = true;
+            inputNombre.value = "";
+            inputNombre.classList.add('bg-light'); // Poner fondo gris
             inputNombre.placeholder = "Se llenará al buscar DNI";
         }
     }
 
-// --- 3. API DE DNI (CON TU TOKEN REAL DE APIPERU.DEV) ---
+    // --- 3. LÓGICA DE API DNI (INTEGRADA DE TU CÓDIGO ANTERIOR) ---
     async function consultarDNI() {
-        const dniInput = document.getElementById('dni');
-        const dni = dniInput.value;
-        const nombreInput = document.getElementById('nombre');
-        
-        // Validar longitud
+        const dni = document.getElementById('dni').value;
+        const btn = document.getElementById('btnBuscarDNI');
+        const errorMsg = document.getElementById('mensajeError');
+        const inputNombre = document.getElementById('nombre');
+
+        // Reset
+        inputNombre.value = "";
+        errorMsg.style.display = 'none';
+
         if (dni.length !== 8) {
-            return alert("El DNI debe tener 8 dígitos exactos.");
+            errorMsg.innerText = "⚠️ El DNI debe tener 8 dígitos.";
+            errorMsg.style.display = 'block';
+            return;
         }
 
-        // Token y URL que me diste
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>'; // Efecto carga
+
+        // TU TOKEN Y URL
         const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImZyYW5rbWVuZG96YXl0czI1MThAZ21haWwuY29tIn0.vKGyh2NtkPl472-FY5Mop-I7DuOCt2Iq02KS2E-iZio';
         const url = `https://apiperu.dev/api/dni/${dni}?api_token=${token}`;
 
         try {
-            // Feedback visual (Opcional: cambia el cursor o deshabilita botones)
-            nombreInput.placeholder = "⏳ Consultando RENIEC...";
-            
             const response = await fetch(url);
             
-            if (!response.ok) {
-                throw new Error("Error en la respuesta del servidor");
-            }
+            if (!response.ok) throw new Error("Error en conexión");
+            
+            const data = await response.json();
 
-            const resultado = await response.json();
-
-            // La API suele devolver { success: true, data: { ... } }
-            if (resultado.success) {
-                const persona = resultado.data;
-                // Concatenamos Nombres + Apellido P + Apellido M
-                const nombreCompleto = `${persona.nombres} ${persona.apellido_paterno} ${persona.apellido_materno}`;
-                
-                nombreInput.value = nombreCompleto;
-                alert(`✅ Encontrado: ${nombreCompleto}`);
+            if (data.success && data.data) {
+                // AQUÍ LA FUSIÓN: Concatenamos los datos para guardarlos en Supabase
+                const nombreCompleto = `${data.data.nombres} ${data.data.apellido_paterno} ${data.data.apellido_materno}`;
+                inputNombre.value = nombreCompleto;
             } else {
-                alert("❌ DNI no encontrado o no existe.");
-                nombreInput.value = "";
+                throw new Error("DNI no encontrado en RENIEC.");
             }
 
         } catch (error) {
-            console.error("Error API:", error);
-            alert("Hubo un problema al conectar con la API de DNI.");
-            nombreInput.placeholder = "Intenta escribir el nombre manualmente";
-            nombreInput.readOnly = false; // Permitimos escribir si falla la API
+            console.error(error);
+            errorMsg.innerText = "❌ No se encontraron datos o error de red.";
+            errorMsg.style.display = 'block';
+            
+            // Si falla, permitir escritura manual (fallback)
+            inputNombre.readOnly = false;
+            inputNombre.placeholder = "Escribe tu nombre manualmente";
+            inputNombre.classList.remove('bg-light');
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "🔍 Buscar";
         }
     }
+
     // --- 4. REGISTRO EN SUPABASE ---
     async function registrarUsuario() {
+        const btn = document.getElementById('btnRegistrar');
         const email = document.getElementById('reg-email').value;
         const password = document.getElementById('reg-password').value;
         const nombre = document.getElementById('nombre').value;
         const tipo = document.getElementById('tipo-turista').value;
         const dni = document.getElementById('dni').value;
 
-        if (!email || !password || !nombre) return alert("Completa todos los datos");
+        if (!email || !password || !nombre) return alert("Por favor completa todos los campos.");
 
-        // A. Crear usuario en Auth (USAMOS supabaseClient)
+        btn.disabled = true;
+        btn.innerText = "Registrando...";
+
+        // A. Crear usuario en Auth
         const { data, error } = await supabaseClient.auth.signUp({
             email: email,
             password: password
         });
 
-        if (error) return alert("Error registro: " + error.message);
+        if (error) {
+            btn.disabled = false;
+            btn.innerText = "REGISTRARSE";
+            return alert("Error al registrar: " + error.message);
+        }
 
-        // B. Guardar datos extra en tabla 'perfiles'
+        // B. Guardar perfil en tabla
         const { error: perfilError } = await supabaseClient
             .from('perfiles')
             .insert([{
-                id: data.user.id, // El ID que generó Supabase Auth
+                id: data.user.id,
                 nombre_completo: nombre,
                 tipo_turista: tipo,
                 dni: tipo === 'Nacional' ? dni : null,
@@ -181,11 +241,15 @@
             }]);
 
         if (perfilError) {
-            alert("Usuario creado pero error al guardar perfil: " + perfilError.message);
+            alert("Usuario creado pero error en perfil: " + perfilError.message);
         } else {
-            alert("✅ ¡Registro Exitoso! Ahora puedes iniciar sesión.");
-            toggleView();
+            alert("✅ ¡Bienvenido " + nombre + "! Registro exitoso.");
+            // Aquí recargamos la página o redirigimos
+            window.location.reload(); 
         }
+        
+        btn.disabled = false;
+        btn.innerText = "REGISTRARSE";
     }
 
     // --- 5. LOGIN ---
@@ -193,8 +257,11 @@
         e.preventDefault();
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
+        const btn = document.querySelector('#form-login button');
 
-        // USAMOS supabaseClient AQUÍ TAMBIÉN
+        btn.disabled = true;
+        btn.innerText = "Verificando...";
+
         const { data, error } = await supabaseClient.auth.signInWithPassword({
             email: email,
             password: password
@@ -202,11 +269,26 @@
 
         if (error) {
             alert("Error: " + error.message);
+            btn.disabled = false;
+            btn.innerText = "INGRESAR";
         } else {
-            alert("👋 Bienvenido al sistema, " + data.user.email);
-            // window.location.href = "mapa.html"; 
+            // ÉXITO: Aquí redirigirías a tu mapa o panel principal
+            document.querySelector('.card-body').innerHTML = `
+                <div class="text-center text-success">
+                    <h3>¡Hola de nuevo!</h3>
+                    <p>Has ingresado como <b>${data.user.email}</b></p>
+                    <p>Cargando el optimizador de rutas...</p>
+                    <div class="spinner-border text-danger"></div>
+                </div>
+            `;
+            
+            // Simular redirección (puedes cambiar esto por window.location.href = 'app.html')
+            setTimeout(() => {
+                console.log("Usuario logueado:", data.user);
+            }, 2000);
         }
     });
 </script>
+
 </body>
 </html>
